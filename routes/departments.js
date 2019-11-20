@@ -1,10 +1,9 @@
 module.exports = function(departments,knex){
   // get list of all departments
-  departments.get('/',(request, response, next)=>{
-    var query = knex.select('*').from('department').then((departmentList)=>{
-      console.log("\nDepartment List:\n" ,departmentList);
-      return response.json(departmentList)
-    });
+  departments.get('/',async(request, response, next)=>{
+    var query = await request.db.Department.query();
+    console.log(query)
+    response.json(query)
   });
 
   // get department by id

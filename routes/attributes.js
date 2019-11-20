@@ -5,19 +5,18 @@ module.exports = function(attributes, knex){
     response.json(query)
     console.log(query)
   });
-  //var query = knex.select('*').from('attribute').then((attributeList)=>{
-    //console.log('\nAttribute List:\n',attributeList);
-    //return response.json(attributeList);
-  //});
 
   // Get Attribute by id
-  attributes.get('/:attribute_id',(request, response, next)=>{
+  attributes.get('/:attribute_id',async(request, response, next)=>{
     var attribute_id = request.params.attribute_id;
-    var query = knex.select('*').from('attribute').where('attribute_id',attribute_id)
-        .then((attribute)=>{
-          console.log("\nAttribute by Id:\n",attribute);
-          return response.json(attribute[0]);
-        });
+    var query = await request.db.Attribute.query().where(attribute_id).then(function(attribute){
+      response.json(attribute); 
+    },next);
+      
+    // var query = knex.select('*').from('attribute').where('attribute_id',attribute_id).then((attribute)=>{
+    //       console.log("\nAttribute by Id:\n",attribute);
+    //       return response.json(attribute[0]);
+    //     });
   });
 
   // Get values Attributes from attribute

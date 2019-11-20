@@ -1,10 +1,9 @@
 module.exports = function(categories,knex){
   // Get list of all categories
-  categories.get('/',(request, response, next)=>{
-    var query = knex.select('*').from('category').then((categoryList)=>{
-      console.log("\nCategories:\n" ,categoryList);
-      return response.json({count:categoryList.length, rows:categoryList})
-    });
+  categories.get('/',async(request, response, next)=>{
+    var query = await request.db.Category.query()
+    console.log(query);
+    response.json(query)
   });
 
   // Get category by id

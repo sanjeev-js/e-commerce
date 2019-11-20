@@ -1,10 +1,9 @@
 module.exports = function(tax,knex){
   //Get all Taxes
-  tax.get('/',(request, response, next)=>{
-    var query = knex.select('*').from('tax').then((taxList)=>{
-      console.log('\nAll tax list:\n',taxList);
-      return response.json(taxList);
-    });
+  tax.get('/',async(request, response, next)=>{
+  var query = await request.db.Tax.query();
+  console.log(query);
+      return response.json(query);
   });
 
   //Get Tax by ID

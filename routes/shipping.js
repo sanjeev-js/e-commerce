@@ -1,10 +1,9 @@
 module.exports = function(shipping,knex){
   //Return shipping regions from shipping_region table
-  shipping.get('/regions',(request, response, next)=>{
-    var query = knex.select('*').from('shipping_region').then((shippingData)=>{
-      console.log('\nShipping region data:\n',shippingData);
-      return response.json(shippingData);
-    });
+  shipping.get('/regions',async(request, response, next)=>{
+    var query = await request.db.Shipping.query();
+    console.log(query)
+    response.json(query)
   });
 
   //Return shipping regions from shipping table
