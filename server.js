@@ -7,8 +7,13 @@ const app = express();
 let jwt = require('jsonwebtoken');
 const config = require('./config');
 var Stripe = require('stripe');
-
 const mysql = require('mysql');
+const { Model } = require('objection');
+const database = require('./database/createDatabase.js')
+const Knex = require('knex');
+const knexConfig = require('./knexconfig');
+Model.knex(Knex(knexConfig.development));
+
 var knex = require('knex')({
   client: 'mysql',
   connection: {
@@ -21,6 +26,11 @@ var knex = require('knex')({
 
 // data will be sent in the request body
 app.use(express.json());
+app.use((request, response, next) => {
+  request.base = `${request.protocol}://${request.get('host')}`
+  request.db = database
+  return next()
+})
 
 // route for departments
 var departments = express.Router();

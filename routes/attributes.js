@@ -1,11 +1,14 @@
 module.exports = function(attributes, knex){
   // Get Attributes list
-  attributes.get('/',(request, response, next)=>{
-    var query = knex.select('*').from('attribute').then((attributeList)=>{
-      console.log('\nAttribute List:\n',attributeList);
-      return response.json(attributeList);
-    });
+  attributes.get('/',async(request, response, next)=>{
+    var query = await request.db.Attribute.query();
+    response.json(query)
+    console.log(query)
   });
+  //var query = knex.select('*').from('attribute').then((attributeList)=>{
+    //console.log('\nAttribute List:\n',attributeList);
+    //return response.json(attributeList);
+  //});
 
   // Get Attribute by id
   attributes.get('/:attribute_id',(request, response, next)=>{
