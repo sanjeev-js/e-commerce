@@ -1,9 +1,5 @@
-
 const config = require('../config');
-// var express = require('express');
-// var app = express();
-// var _customer = express.Router();
-// app.use('/customer',_customer);
+
 module.exports = function(customers,_customer,knex,jwt){
   // Register a customer
   customers.post('/',async(request, response, next)=>{
