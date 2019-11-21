@@ -2,18 +2,10 @@ const config = require('../config');
 
 module.exports = function(products,knex,jwt){
   // Get list of all products
-  products.get('/',(request, response, next)=>{
-    var query = knex.select(
-      'product_id',
-      'name',
-      'description',
-      'price',
-      'discounted_price',
-      'thumbnail'
-    ).from('product').then((productList)=>{
-      console.log("\nProduct List:\n" ,productList);
-      return response.json({count:productList.length, rows:productList})
-    });
+  products.get('/',async(request, response, next)=>{
+    var query = await request.db.Product.query().select('product_id','name','description','price','discounted_price','thumbnail');
+    console.log (query);
+    return response.json(query);
   });
 
   // search product  Note do this task at the end
@@ -32,20 +24,16 @@ module.exports = function(products,knex,jwt){
   });
 
   // Get product by id
-  products.get('/:product_id',(request, response, next)=>{
+  products.get('/:product_id',async(request, response, next)=>{
     var product_id = request.params.product_id;
-    var query = knex.select('*').from('product').where('product_id',product_id)
-    .then((product)=>{
-      if(product.length == 0){
-        var errMsg =  {
-                        "error": "Don't exist product with this ID."
-                     }
-        console.log("\nProduct:\n" ,"Don't exist department with this ID.");
-        return response.json(errMsg);
+    var query = await request.db.Product.query().where("product_id", product_id).then((product)=>{
+      if (product.length == 0) {
+        var errMsg = {"error" : "Don't exist any product with this id."}
+        return response.json(errMsg)
       }
-      console.log("\nProduct:\n" ,product[0]);
-      return response.json(product[0]);
-    });
+      return response.json(product)
+    })
+    response.json(query);
   });
 
   // Get list of Products of Categories.
@@ -90,21 +78,12 @@ module.exports = function(products,knex,jwt){
   });
 
   // Get detils of product
-  products.get('/:product_id/details',(request, response, next)=>{
+  products.get('/:product_id/details',async(request, response, next)=>{
     var product_id = request.params.product_id;
-    var query = knex.select(
-      `product_id`,
-      `name`,
-      `description`,
-      `price`,
-      `discounted_price`,
-      `image`,
-      'image_2 as image2'
-    ).from('product').where('product_id',product_id).then((product)=>{
-      if(product.length == 0){ return response.json(product)};
-      console.log("\nDetails of product:\n",product[0]);
-      return response.json(product[0]);
-    });
+    var query = await request.db.Product.query().select('product_id','name','description','price','discounted_price','image','image_2 as image2')
+    .where('product_id',product_id).then((product)=>{
+      return response.json(product)
+    })
   });
 
   // Get location of product

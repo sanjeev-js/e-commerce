@@ -7,18 +7,16 @@ module.exports = function(categories,knex){
   });
 
   // Get category by id
-  categories.get('/:category_id',(request, response, next)=>{
+  categories.get('/:category_id',async(request, response, next)=>{
     var category_id = request.params.category_id;
-    var query = knex.select('*').from('category').where('category_id',category_id).then((category)=>{
+    var query = await request.db.Category.query().where('category_id',category_id).then((category)=>{
       if(category.length == 0){
         var errMsg = {
                         "error": "Don't exist product with this ID."
                      }
-        console.log("\nCategory:\n" ,"Don't exist category with this ID.");
         return response.json(errMsg);
       }
-      console.log("\nCategory:\n" ,category[0]);
-      return response.json(category[0]);
+      return response.json(category);
     });
   });
 

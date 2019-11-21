@@ -2,21 +2,14 @@ module.exports = function(attributes, knex){
   // Get Attributes list
   attributes.get('/',async(request, response, next)=>{
     var query = await request.db.Attribute.query();
-    response.json(query)
-    console.log(query)
+    return response.json(query)
   });
 
   // Get Attribute by id
-  attributes.get('/:attribute_id',async(request, response, next)=>{
-    var attribute_id = request.params.attribute_id;
-    var query = await request.db.Attribute.query().where(attribute_id).then(function(attribute){
-      response.json(attribute); 
-    },next);
-      
-    // var query = knex.select('*').from('attribute').where('attribute_id',attribute_id).then((attribute)=>{
-    //       console.log("\nAttribute by Id:\n",attribute);
-    //       return response.json(attribute[0]);
-    //     });
+  attributes.get('/:id',async(request, response, next)=>{
+    var id = request.params.id;
+    var query = await request.db.Attribute.query().where('attribute_id',id);
+      return response.json(query);
   });
 
   // Get values Attributes from attribute

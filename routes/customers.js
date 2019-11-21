@@ -6,7 +6,7 @@ const config = require('../config');
 // app.use('/customer',_customer);
 module.exports = function(customers,_customer,knex,jwt){
   // Register a customer
-  customers.post('/',(request, response, next)=>{
+  customers.post('/',async(request, response, next)=>{
       //Example of request body
       `{
           "name" : "< customer name >"
@@ -17,17 +17,16 @@ module.exports = function(customers,_customer,knex,jwt){
         email : request.body.email,
         password : request.body.password
       }
-      var insertQuery = knex('customer').insert(request.body).then(()=>{
-        var query = knex.select('*').from('customer').where(customer)
-        .then((customersDetail)=>{
+      var insertQuery = await request.db.Customer.query().insert(request.body).then(async()=>{
+        var query = await request.db.Customer.query().where(customer).then((customersDetail)=>{
           jwt.sign({
             customer
           },config.secret,{expiresIn:config.expires_in},(err,token)=>{
 
-            console.log('\nCoustomer Details:',customersDetail[0]);
+            console.log('\nCoustomer Details:',customersDetail);
             return response.json({
               customer : {
-                schema : customersDetail[0]
+                schema : customersDetail
               },
               accessToken :  "Bearer "+ token,
               expires_in : config.expires_in
@@ -50,19 +49,17 @@ module.exports = function(customers,_customer,knex,jwt){
   };
 
   // Log In in the shopping
-  customers.post('/login',verifyToken,(request, response, next)=>{
+  customers.post('/login',verifyToken,async(request, response, next)=>{
     //Example of request body
     `{
 	      "email" : "customer@example.com",
 	      "password" : "password"
     }`
-    var email = request.body.email;
-    var password = request.body.password;
     var customer = {
-      email : email,
-      password: password
+      email : request.body.email,
+      password: request.body.password
     }
-    var query = knex('customer').where(customer).select("*").then((customerDetail)=>{
+    var query = await request.db.Customer.query().where(customer).then(async(customerDetail)=>{
       jwt.verify(request.token, config.secret, (err, customerData)=>{
         if(err){
           // return response.sendStatus(403);
@@ -74,10 +71,10 @@ module.exports = function(customers,_customer,knex,jwt){
           });
         };
         if(customerData.customer.email == email && customerData.customer.password == password){
-          console.log('\nCoustomer Details:',customerDetail[0]);
+          console.log('\nCoustomer Details:',customerDetail);
           return response.json({
             customer : {
-              schema : customerDetail[0]
+              schema : customerDetail
             },
             accessToken :  "Bearer "+ request.token,
             expires_in : config.expires_in

@@ -1,18 +1,15 @@
-module.exports = function(tax,knex){
+module.exports = function(tax){
   //Get all Taxes
   tax.get('/',async(request, response, next)=>{
   var query = await request.db.Tax.query();
-  console.log(query);
       return response.json(query);
   });
 
   //Get Tax by ID
-  tax.get('/:tax_id',(request, response, next)=>{
+  tax.get('/:tax_id',async(request, response, next)=>{
     var tax_id = request.params.tax_id;
-    var query = knex.select('*').from('tax').where('tax_id',tax_id)
-        .then((tax)=>{
-          console.log('\nTax info:\n',tax[0]);
-          return response.json(tax[0]);
+    var query = await request.db.Tax.query().where('tax_id',tax_id).then((tax)=>{
+          return response.json(tax);
         });
   });
 };

@@ -1,17 +1,21 @@
-module.exports = function(departments,knex){
+module.exports = function(departments){
   // get list of all departments
   departments.get('/',async(request, response, next)=>{
     var query = await request.db.Department.query();
-    console.log(query)
     response.json(query)
   });
 
   // get department by id
-  departments.get('/:department_id',(request, response, next)=>{
+  departments.get('/:department_id',async(request, response, next)=>{
     var department_id = request.params.department_id;
-    var query = knex.select('*').from('department').where('department_id',department_id).then((department)=>{
-      console.log("\nDepartment:\n" ,department[0]);
-      return response.json(department[0]);
+    var query = await request.db.Department.query().where('department_id',department_id).then((department)=>{
+      if(department.length == 0){
+        var errMsg = {
+                        "error": "Don't exist any department with this ID."
+                     }
+        return response.json(errMsg);
+      }
+      return response.json(department);
     });
   });
 };
