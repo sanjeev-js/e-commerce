@@ -45,7 +45,7 @@ module.exports = function(customers,_customer,knex,jwt){
   };
 
   // Log In in the shopping
-  customers.post('/login',verifyToken,async(request, response, next)=>{
+  customers.post('/login',verifyToken,(request, response, next)=>{
     //Example of request body
     `{
 	      "email" : "customer@example.com",
@@ -55,34 +55,34 @@ module.exports = function(customers,_customer,knex,jwt){
       email : request.body.email,
       password: request.body.password
     }
-    var query = await request.db.Customer.query().where(customer).then(async(customerDetail)=>{
-      jwt.verify(request.token, config.secret, (err, customerData)=>{
-        if(err){
-          // return response.sendStatus(403);
-          const refreshToken = jwt.sign({customer
-          },config.secret,{expiresIn:config.expires_in},(err,token)=>{
-            request.token = token;
-            console.log("token",token);
-            return response.json({newToken:token});
+    var query = knex('customer').where(customer).select("*").then((customerDetail)=>{
+          jwt.verify(request.token, config.secret, (err, customerData)=>{
+            if(err){
+              // return response.sendStatus(403);
+              const refreshToken = jwt.sign({customer
+              },config.secret,{expiresIn:config.expires_in},(err,token)=>{
+                request.token = token;
+                console.log("token",token);
+                return response.json({newToken:token});
+              });
+            };
+            if(customerData.customer.email == email && customerData.customer.password == password){
+              console.log('\nCoustomer Details:',customerDetail[0]);
+              return response.json({
+                customer : {
+                  schema : customerDetail[0]
+                },
+                accessToken :  "Bearer "+ request.token,
+                expires_in : config.expires_in
+              });
+            }else{
+              return response.json({
+                errorMsg :"Invalid user or Invalid Token"
+              });
+            };
           });
-        };
-        if(customerData.customer.email == email && customerData.customer.password == password){
-          console.log('\nCoustomer Details:',customerDetail);
-          return response.json({
-            customer : {
-              schema : customerDetail
-            },
-            accessToken :  "Bearer "+ request.token,
-            expires_in : config.expires_in
-          });
-        }else{
-          return response.json({
-            errorMsg :"Invalid user or Invalid Token"
-          });
-        };
+        });
       });
-    });
-  });
 
   //Get customer by ID. The customer is getting by Token
   // Put the customer access token in postman headers to get customer

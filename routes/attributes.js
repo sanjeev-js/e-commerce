@@ -1,4 +1,4 @@
-module.exports = function(attributes, knex){
+module.exports = function(attributes){
   // Get Attributes list
   attributes.get('/',async(request, response, next)=>{
     var query = await request.db.Attribute.query();
@@ -13,21 +13,22 @@ module.exports = function(attributes, knex){
   });
 
   // Get values Attributes from attribute
-  attributes.get('/values/:attribute_id',(request, response, next)=>{
+  attributes.get('/values/:attribute_id',async(request, response, next)=>{
       var attribute_id = request.params.attribute_id;
-      var query = knex.select('attribute_value_id','value').from('attribute_value')
-          .join('attribute',function(){
-            this.on('attribute_value.attribute_id','=','attribute.attribute_id');
-          }).where('attribute.attribute_id',attribute_id).then((attributeValueList)=>{
-            console.log("\nAttribute value list:\n",attributeValueList);
-            return response.json(attributeValueList);
-          });
+      var query = await request.db.Attribute.query().eager('attribute_value')
+      .where('attribute.attribute_id',attribute_id).then((value)=>{
+        if (value.length == 0) {
+          var errMsg = {'error' : "No attribute with this id"}
+          return response.json(errMsg)
+        }
+      return response.json(value)
+    });
   });
 
   // Get all Attributes with Product ID
-  attributes.get('/inProduct/:product_id',(request, response, next)=>{
+  attributes.get('/inProduct/:product_id',async(request, response, next)=>{
     var product_id = request.params.product_id;
-    var query = knex.select(
+    var query = await request.db.Attribute.knex().select(
       'attribute.name as attribute_name',
       'attribute_value.attribute_value_id',
       'value as attribute_value')
