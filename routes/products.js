@@ -87,9 +87,9 @@ module.exports = function(products,knex,jwt){
   });
 
   // Get location of product
-  products.get('/:product_id/locations',(request, response, next)=>{
+  products.get('/:product_id/locations',async(request, response, next)=>{
     var product_id = request.params.product_id;
-    var query = knex.select(
+    var query = await request.db.Product.query().knex().select(
       'category.category_id',
       'category.name as category_name',
       'department.department_id',

@@ -1,9 +1,9 @@
-'use strict' 
+'use strict'
 
 const {Model} = require ('objection');
 
 class ShoppingCart extends Model {
-    static get tablename() {
+    static get tableName() {
         return "shopping_cart";
     }
 }
