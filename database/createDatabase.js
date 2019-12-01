@@ -2,7 +2,7 @@ const glob = require('glob')
 const path = require('path')
 
 
-    const db = glob.sync('./schemas/**/*.js', { cwd: __dirname })
+    const db = glob.sync('./Models/**/*.js', { cwd: __dirname })
     .map(filename => {
         return {
             schema: require(filename),
@@ -11,7 +11,6 @@ const path = require('path')
                 .replace(path.extname(filename), ''),
         }
     })
-    //.map(({name, schema}) => mongoose.model(name, schema))
     .reduce((db, {name,schema}) => {
         return {
             ...db,

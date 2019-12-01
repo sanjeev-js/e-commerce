@@ -171,7 +171,7 @@ module.exports = function (shoppingcart,knex){
             .del().then(()=>{
               response.json({message:"Sucessfully saved for later"});
             });
-          });
+            });
         });
       };
     });
@@ -189,17 +189,17 @@ module.exports = function (shoppingcart,knex){
   });
 
   //Move item to shopping cart
-  shoppingcart.get('/moveToCart/:item_id',(request, response, next)=>{
+  shoppingcart.get('/moveToCart/:item_id',async(request, response, next)=>{
     var item_id = request.params.item_id;
-    var query = knex.select(
+    var query = await request.db.ShoppingCart.knex().select(
       'item_id',
       'cart_id',
       'product_id',
       'attributes',
-      'quantity').from('save_items').where('item_id',item_id).then((saveItem)=>{
+      'quantity').from('save_items').where('item_id',item_id).then(async(saveItem)=>{
         saveItem[0]['added_on'] = new Date();
-        var moveQuery = knex('shopping_cart').insert(saveItem[0]).then(()=>{
-          var removeQuery = knex('save_items').where('item_id',item_id)
+        var moveQuery = await request.db.ShoppingCart.knex('shopping_cart').insert(saveItem[0]).then(async()=>{
+          var removeQuery = await request.db.ShoppingCart.knex('save_items').where('item_id',item_id)
           .del().then(()=>{
             return response.json({message:"Item moved to cart Sucessfully"})
           })

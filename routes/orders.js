@@ -77,9 +77,9 @@ module.exports = function (orders,knex){
   });
 
   //Get info about order
-  orders.get('/:order_id',(request, response, next)=>{
+  orders.get('/:order_id',async(request, response, next)=>{
     var order_id = request.params.order_id;
-    var query = knex.select(
+    var query = await request.db.Order.knex().select(
       'order_placed.order_id',
       'shopping_cart.product_id',
       'product.name as product_name',
@@ -100,9 +100,9 @@ module.exports = function (orders,knex){
   });
 
   //Get orders by customer
-  orders.get('/inCustomer/:customer_id',(request, response, next)=>{
+  orders.get('/inCustomer/:customer_id',async(request, response, next)=>{
     var customer_id = request.params.customer_id;
-    var query = knex.select(
+    var query = await request.db.Order.knex().select(
       'order_placed.order_id',
       'order_placed.product_id',
       'product.name as product_name',
@@ -127,9 +127,9 @@ module.exports = function (orders,knex){
   });
 
   //Get info about order
-  orders.get('/shortDetail/:order_id',(request, response, next)=>{
+  orders.get('/shortDetail/:order_id',async(request, response, next)=>{
     var order_id = request.params.order_id;
-    var query = knex.select(
+    var query = await request.db.Order.knex().select(
       'orders.order_id',
       'total_amount',
       'created_on',

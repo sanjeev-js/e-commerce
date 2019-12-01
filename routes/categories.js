@@ -37,7 +37,7 @@ module.exports = function(categories,knex){
     // Get category in department by department id
     categories.get('/inDepartment/:department_id',async(request, response, next)=>{
       var department_id = request.params.department_id;
-      var query = await request.db.Category.knex().select('*').from('category').where('department_id',department_id).then((category)=>{
+      var query = await request.db.Category.query().select('*').where('department_id',department_id).then((category)=>{
         console.log("\nCategory by department:\n",category);
         return response.json(category);
       });

@@ -23,6 +23,7 @@ module.exports = function(products,knex,jwt){
     });
   });
 
+
   // Get product by id
   products.get('/:product_id',async(request, response, next)=>{
     var product_id = request.params.product_id;
@@ -33,7 +34,6 @@ module.exports = function(products,knex,jwt){
       }
       return response.json(product)
     })
-    response.json(query);
   });
 
   // Get list of Products of Categories.
@@ -55,9 +55,9 @@ module.exports = function(products,knex,jwt){
   })
 
   // Get list of Products on Department
-  products.get('/inDepartment/:department_id',(request, response, next)=>{
+  products.get('/inDepartment/:department_id',async(request, response, next)=>{
     var department_id = request.params.department_id;
-    var query = knex.select(
+    var query = await request.db.Product.knex().select(
       `product.product_id`,
       `product.name`,
       `product.description`,
@@ -89,7 +89,7 @@ module.exports = function(products,knex,jwt){
   // Get location of product
   products.get('/:product_id/locations',async(request, response, next)=>{
     var product_id = request.params.product_id;
-    var query = await request.db.Product.query().knex().select(
+    var query = await request.db.Product.knex().select(
       'category.category_id',
       'category.name as category_name',
       'department.department_id',
@@ -108,47 +108,47 @@ module.exports = function(products,knex,jwt){
   });
 
   //Rivew to the product by customer
-  // NOTE: To run this endpoint have to create customer first
-  products.post('/:product_id/reviews',(request, response, next)=>{
-    //Example for request body
-    //Ensure the product id in requet params and in body is same
-    `{
-      	"product_id" : 3,
-      	"review" : "Best",
-      	"rating" : 3
-    }`
-    var product_id = request.params.product_id;
-    var content = request.body;
-    var token = request.headers['authorization'].split(' ')[1];
-    jwt.verify(token,config.secret,(err,customerData)=>{
-      var customer = {
-        email:customerData.customer.email,
-        password : customerData.customer.password
-      };
-      var query = knex.select('*').from('customer')
-      .where(customer).then((customerDetail)=>{
-        var today = new Date();
-        content['customer_id'] = customerDetail[0].customer_id;
-        content['created_on'] = today;
-        var insertQuery = knex('review').insert(content).then(()=>{
-          console.log("Sucessfully review add");
-          return response.json({message:"Review is added Sucessfully"});
-        });
-      });
-    });
-  });
+ // NOTE: To run this endpoint have to create customer first
+ products.post('/:product_id/reviews',(request, response, next)=>{
+   //Example for request body
+   //Ensure the product id in requet params and in body is same
+   `{
+       "product_id" : 3,
+       "review" : "Best",
+       "rating" : 3
+   }`
+   var product_id = request.params.product_id;
+   var content = request.body;
+   var token = request.headers['authorization'].split(' ')[1];
+   jwt.verify(token,config.secret,(err,customerData)=>{
+     var customer = {
+       email:customerData.customer.email,
+       password : customerData.customer.password
+     };
+     var query = knex.select('*').from('customer')
+     .where(customer).then((customerDetail)=>{
+       var today = new Date();
+       content['customer_id'] = customerDetail[0].customer_id;
+       content['created_on'] = today;
+       var insertQuery = knex('review').insert(content).then(()=>{
+         console.log("Sucessfully review add");
+         return response.json({message:"Review is added Sucessfully"});
+       });
+     });
+   });
+ });
 
   //Get reviews of the product
   // NOTE: To run this endpoint have to create customer first
-  products.get('/:product_id/reviews',(request, response, next)=>{
+  products.get('/:product_id/reviews',async(request, response, next)=>{
     var product_id = request.params.product_id;
     var token = request.headers['authorization'].split(' ')[1];
-    jwt.verify(token,config.secret,(err,customerData)=>{
+    jwt.verify(token,config.secret,async(err,customerData)=>{
       var customer = {
         email:customerData.customer.email,
         password : customerData.customer.password
       };
-      var query = knex.select(
+      var query = await request.db.Customer.knex().select(
         'customer.name',
         'review',
         'rating',
