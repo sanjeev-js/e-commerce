@@ -1,6 +1,6 @@
 ## e-commerce-website
 ## Uses Mysql, stripe api, objection.js, Knex.js
-### This project is taken from Turing(https://backendapi.turing.com/docs/) for practice.
+### This project is taken from Turing(https://backendapi.turing.com/docs/) for learning purpose.
 
 ### In this project I learnt many things like by jsonwebtoken we can create a login pathway for our customer.
 
