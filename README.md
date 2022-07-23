@@ -4,5 +4,5 @@
 
 ### In this project I learnt many things like by jsonwebtoken we can create a login pathway for our customer.
 
-### Implemented many things like shopping cart for the user, creating an order, payment gateway using stripe api.
+### Implemented many things like shopping cart for the user, creating an order.
 
